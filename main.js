@@ -1,10 +1,11 @@
+//html 요소들을 저장함
 const input = document.querySelector('#input');
 const add = document.querySelector('#add');
 const del = document.querySelector('#del');
 const ul = document.querySelector('#ul');
 
-//추가하는 버튼
-add.addEventListener('click', (event => {
+//목록에 추가하는 함수
+const addToDoList = function() {
     //내용이 없으면 알림
     if (input.value === "") {
         alert("내용을 입력해주세요");
@@ -12,31 +13,82 @@ add.addEventListener('click', (event => {
         return
     }
 
-    //목록과 체크박스, 삭제버튼 생성
+    //목록과 체크박스, 수정버튼, 삭제버튼 생성
     const li = document.createElement('li');
-    const newButton = document.createElement('button');
+    const span = document.createElement('span');
+    const toDoList = document.createElement('input')
     const checkbox = document.createElement('input');
-    newButton.textContent = '삭제';
+    const modifyText = document.createElement('button');
+    const newButton = document.createElement('button');
     checkbox.type = 'checkbox';
+    toDoList.style.border = "0";
+    toDoList.style.outline = "0";
+    toDoList.id = "toDoList";
+    modifyText.innerHTML = '수정';
+    newButton.innerHTML = '삭제';
+
+
 
     //목록에 추가
     ul.appendChild(li);
-    li.textContent = input.value;
+    li.appendChild(span);
+    span.textContent = savedTime();
+    li.appendChild(toDoList);
+    toDoList.value = input.value;
+    document.getElementById('toDoList').readOnly = true;
     li.appendChild(checkbox);
+    li.appendChild(modifyText);
     li.appendChild(newButton);
     input.value ="";
     document.getElementById('input').focus();
 
-
     //체크박스 체크여부에 따라 취소선 유무
     checkbox.addEventListener('change', (event) => {
-        if (li.style.textDecorationLine === "line-through") {
-            li.style.textDecorationLine = "";
+        if (toDoList.style.textDecorationLine === "line-through") {
+            toDoList.style.textDecorationLine = "";
+            span.style.textDecoration = "";
         } else {
-            li.style.textDecorationLine = "line-through"
-         }
+            toDoList.style.textDecorationLine = "line-through"
+            span.style.textDecoration = "line-through";
+
+        }
     })
+
+    //해당 라인 수정 버튼
+    modifyText.addEventListener('click', (event) => {
+        checkbox.hidden = true;
+        toDoList.hidden = true;
+        modifyText.hidden = true;
+        newButton.hidden = true;
+        const imsi = toDoList.value;
+        const newSaved = document.createElement('button');
+        const newInPut = document.createElement('input')
+        newSaved.innerHTML = "저장";
+        newInPut.id = "newInPut"
+        newInPut.value = imsi;
+
+        li.appendChild(newInPut);
+        li.appendChild(newSaved);
+        document.getElementById('newInPut').focus();
+        
     
+        newSaved.addEventListener('click', () => {
+            const changeText = newInPut.value;
+            checkbox.hidden = false;
+            toDoList.hidden = false;
+            modifyText.hidden = false;
+            newButton.hidden = false;
+            newInPut.hidden = true;
+            newSaved.hidden = true;
+            toDoList.value = changeText;   
+            span.textContent = savedTime();      
+            
+        })
+
+        
+        
+
+    })
     // 해당 라인 삭제 버튼
     newButton.addEventListener('click', (event) => {
         const yesNo = confirm('정말로 삭제하시겠습니까?');
@@ -47,7 +99,39 @@ add.addEventListener('click', (event => {
 
       
     })
-}))
+
+
+};
+
+// 시간 출력하는 함수
+const savedTime = function() {
+    const dateNew = new Date();
+    const year = dateNew.getFullYear();
+    const month = dateNew.getMonth() + 1;
+    const date = dateNew.getDate();
+    const hours = dateNew.getHours();
+    const min = dateNew.getMinutes();
+    const sec = dateNew.getSeconds();
+    return `[${year}-${month}-${date} ${hours}:${min}:${sec}]    `
+}
+
+
+
+//입력창에서 엔터키 누르면 추가하는 함수
+const enter = function() {
+    if(window.event.keyCode ==13) {
+    addToDoList();
+    document.getElementById('input').focus();
+    }
+}
+
+
+
+//추가하는 버튼
+add.addEventListener('click', (event) => {
+    addToDoList();
+})
+
 
 // 모든 목록 삭제 버튼
 del.addEventListener('click', (event) => {
